@@ -8,7 +8,7 @@ clear:
 run: build
 	docker run \
 		-p 8080:8080 \
-		pace:latest
+		242617/pace:latest
 
 build: clear
 	docker build \
@@ -16,7 +16,7 @@ build: clear
 		--build-arg PROJECT=${PROJECT} \
 		--build-arg SERVER_ADDRESS=${SERVER_ADDRESS} \
 		--rm \
-		-t pace:latest \
+		-t 242617/pace:latest \
 		.
 
 all: run
