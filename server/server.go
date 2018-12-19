@@ -9,6 +9,11 @@ import (
 	"github.com/242617/pace/config"
 )
 
+const (
+	HeaderCookie = "X-Cookie"
+	HeaderToken  = "X-Token"
+)
+
 func Init() error {
 	fmt.Printf("server started at %s\n", config.ServerAddress)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
@@ -30,13 +35,20 @@ func Init() error {
 
 		defer r.Body.Close()
 		params := route.Handler.Parameters()
-		err := params.Apply(ctx, parameters, r.Body)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
-			return
+		if params != nil {
+			err := params.Apply(ctx, parameters, r.Body)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusBadRequest)
+				return
+			}
 		}
 
-		route.Handler.Process(ctx, w, params)
+		headers := map[string]string{}
+		for k, v := range r.Header {
+			headers[k] = v[0]
+		}
+
+		route.Handler.Process(ctx, w, headers, params)
 
 	})
 	return http.ListenAndServe(config.ServerAddress, nil)

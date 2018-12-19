@@ -21,9 +21,9 @@ func (r routes) Get(url, method string) (bool, string, *route) {
 }
 
 var Routes = routes{
-	"healthcheck": {"/healthcheck", http.MethodGet, &healthcheck{}},
-	"signup":      {"/signup", http.MethodPost, &signup{}},
-	"sms_request": {"/sms/request", http.MethodPost, &sms_request{}},
-	"sms_confirm": {"/sms/confirm", http.MethodPost, &sms_confirm{}},
-	"get_profile": {"/profile", http.MethodGet, &get_profile{}},
+	"healthcheck":  {"/healthcheck", http.MethodGet, &healthcheck{}},
+	"sms_request":  {"/sms/request", http.MethodPost, &sms_request{}},
+	"sms_confirm":  {"/sms/confirm", http.MethodPost, &sms_confirm{}},
+	"get_profile":  {"/profile", http.MethodGet, &profile_get{}},
+	"edit_profile": {"/profile", http.MethodPut, &profile_edit{}},
 }

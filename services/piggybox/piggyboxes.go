@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.qiwi.com/ssk-dev-apps/piggybox-telegram-bot/model"
+	"github.com/242617/pace/model"
 )
 
 func Piggyboxes(token, cookie string) ([]model.Piggybox, error) {
@@ -41,6 +41,7 @@ func Piggyboxes(token, cookie string) ([]model.Piggybox, error) {
 			Alias  string  `json:"alias"`
 			Name   string  `json:"name"`
 			Amount float64 `json:"recommended_amount"`
+			Status int     `json:"status"`
 		} `json:"data"`
 	}
 
@@ -51,7 +52,16 @@ func Piggyboxes(token, cookie string) ([]model.Piggybox, error) {
 		return nil, err
 	}
 
-	fmt.Println(response.Data)
+	var piggyboxes []model.Piggybox
+	for _, piggybox := range response.Data {
+		if piggybox.Status == StatusActive {
+			piggyboxes = append(piggyboxes, model.Piggybox{
+				Alias:  piggybox.Alias,
+				Name:   piggybox.Name,
+				Amount: piggybox.Amount,
+			})
+		}
+	}
 
-	return nil, nil
+	return piggyboxes, nil
 }

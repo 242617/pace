@@ -17,10 +17,12 @@ type sms_confirm struct {
 }
 
 func (*sms_confirm) Parameters() parameters { return &sms_confirm{} }
-func (*sms_confirm) Process(ctx context.Context, w http.ResponseWriter, parameters parameters) {
+func (*sms_confirm) Process(ctx context.Context, w http.ResponseWriter, headers headers, parameters parameters) {
 	params := parameters.(*sms_confirm)
 
-	phone, token, cookie, err := piggybox.SMSConfirm(params.Code, params.VCode, params.Cookie)
+	cookie := headers[HeaderCookie]
+
+	phone, token, cookie, err := piggybox.SMSConfirm(params.Code, params.VCode, cookie)
 	if err != nil {
 		log.Println("err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -35,6 +37,8 @@ func (*sms_confirm) Process(ctx context.Context, w http.ResponseWriter, paramete
 		Token  string `json:"token"`
 		Cookie string `json:"cookie"`
 	}{phone, token, cookie}
+
+	w.WriteHeader(http.StatusCreated)
 
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {

@@ -7,10 +7,11 @@ import (
 )
 
 type handler interface {
-	Process(context.Context, http.ResponseWriter, parameters)
+	Process(context.Context, http.ResponseWriter, headers, parameters)
 	Parameters() parameters
 }
 
+type headers map[string]string
 type parameters interface {
 	Apply(context.Context, map[string]string, io.Reader) error
 }

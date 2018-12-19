@@ -14,7 +14,7 @@ type sms_request struct {
 }
 
 func (*sms_request) Parameters() parameters { return &sms_request{} }
-func (*sms_request) Process(ctx context.Context, w http.ResponseWriter, parameters parameters) {
+func (*sms_request) Process(ctx context.Context, w http.ResponseWriter, headers headers, parameters parameters) {
 	params := parameters.(*sms_request)
 
 	code, cookie, err := piggybox.SMSRequest(params.Phone)
@@ -29,6 +29,8 @@ func (*sms_request) Process(ctx context.Context, w http.ResponseWriter, paramete
 		Code   string `json:"code"`
 		Cookie string `json:"cookie"`
 	}{code, cookie}
+
+	w.WriteHeader(http.StatusCreated)
 
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
