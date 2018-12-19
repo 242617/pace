@@ -16,10 +16,15 @@ func Init() error {
 			http.Error(w, "not implemented", http.StatusNotImplemented)
 			return
 		}
-
 		fmt.Println("name", name)
 
-		route.Handler.Process(w, r)
+		values := map[string]string{}
+		for k, v := range r.URL.Query() {
+			values[k] = v[0]
+		}
+
+		defer r.Body.Close()
+		route.Handler.Process(w, r.Body, values)
 
 	})
 	return http.ListenAndServe(config.ServerAddress, nil)

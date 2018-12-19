@@ -1,6 +1,8 @@
 package server
 
-import "net/http"
+import (
+	"net/http"
+)
 
 type route struct {
 	URL     string
@@ -18,13 +20,7 @@ func (r routes) Get(url, method string) (bool, string, *route) {
 	return false, "", nil
 }
 
-type handler interface {
-	Process(w http.ResponseWriter, r *http.Request)
-}
-
 var Routes = routes{
-	"healthcheck": route{
-		"/healthcheck", http.MethodGet,
-		&healthcheck{},
-	},
+	"healthcheck": {"/healthcheck", http.MethodGet, &healthcheck{}},
+	"signup":      {"/signup", http.MethodPost, &signup{}},
 }
