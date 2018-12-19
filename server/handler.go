@@ -7,7 +7,7 @@ import (
 )
 
 type handler interface {
-	Process(http.ResponseWriter, parameters)
+	Process(context.Context, http.ResponseWriter, parameters)
 	Parameters() parameters
 }
 

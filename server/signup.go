@@ -1,25 +1,26 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+
+	"github.com/242617/pace/storage"
 )
 
 type signup struct {
-	Phone int64 `json:"phone"`
+	Phone string `json:"phone"`
 }
 
-func (s *signup) Parameters() parameters { return &signup{} }
-func (*signup) Process(w http.ResponseWriter, parameters parameters) {
+func (*signup) Parameters() parameters { return &signup{} }
+func (*signup) Process(ctx context.Context, w http.ResponseWriter, parameters parameters) {
 	params := parameters.(*signup)
 
-	fmt.Println("params.Phone", params.Phone)
-
-	// user, err := storage.GetUser(s.Phone)
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-	// fmt.Println(user.Name)
+	user, err := storage.GetUser(ctx, params.Phone)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Println(user.Name)
 
 }

@@ -15,6 +15,7 @@ build: clear
 		--build-arg APPLICATION=${APPLICATION} \
 		--build-arg PROJECT=${PROJECT} \
 		--build-arg SERVER_ADDRESS=${SERVER_ADDRESS} \
+		--build-arg DB_CONN=${DB_CONN} \
 		--rm \
 		-t 242617/pace:latest \
 		.

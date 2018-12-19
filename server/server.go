@@ -36,7 +36,7 @@ func Init() error {
 			return
 		}
 
-		route.Handler.Process(w, params)
+		route.Handler.Process(ctx, w, params)
 
 	})
 	return http.ListenAndServe(config.ServerAddress, nil)
