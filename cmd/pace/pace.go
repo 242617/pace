@@ -12,6 +12,7 @@ import (
 
 func main() {
 	log.SetFlags(log.Lshortfile)
+	fmt.Printf("%s starting\n", version.Application)
 
 	err := storage.Init()
 	if err != nil {
@@ -23,6 +24,5 @@ func main() {
 		log.Fatal(err)
 	}
 
-	fmt.Printf("%s started\n", version.Application)
 	log.Fatal(server.Init())
 }

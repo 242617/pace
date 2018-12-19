@@ -18,6 +18,13 @@ func Init() error {
 	fmt.Printf("server started at %s\n", config.ServerAddress)
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 
+		if r.Method == http.MethodOptions {
+			w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
+		}
+		w.Header().Set("Access-Control-Allow-Credentials", "true")
+		w.Header().Set("Access-Control-Allow-Headers", "Cache-Control, Authorization, Origin, Content-Type, RequestToken, X-Token, X-Cookie")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+
 		ok, name, route := Routes.Get(r.RequestURI, r.Method)
 		if !ok {
 			http.Error(w, "not implemented", http.StatusNotImplemented)

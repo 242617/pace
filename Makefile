@@ -8,6 +8,7 @@ clear:
 run: build
 	docker run \
 		-p 8080:8080 \
+		-e DB_CONN=${DB_CONN} \
 		242617/pace:latest
 
 build: clear
@@ -15,7 +16,7 @@ build: clear
 		--build-arg APPLICATION=${APPLICATION} \
 		--build-arg PROJECT=${PROJECT} \
 		--build-arg SERVER_ADDRESS=${SERVER_ADDRESS} \
-		--build-arg DB_CONN=${DB_CONN} \
+		--build-arg DB_CONN="${DB_CONN}" \
 		--rm \
 		-t 242617/pace:latest \
 		.

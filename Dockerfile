@@ -14,6 +14,7 @@ ENV DB_CONN ${DB_CONN}
 
 WORKDIR $GOPATH
 COPY . src/github.com/242617/pace
+ADD https://storage.yandexcloud.net/mdb/CA.pem .
 
 RUN go get ./...
 RUN go build \
