@@ -1,15 +1,21 @@
 package server
 
 import (
+	"context"
 	"io"
 	"net/http"
 )
 
 type handler interface {
-	Process(http.ResponseWriter, io.Reader, map[string]string)
-	Validate(map[string]string, io.Reader) error
+	Process(http.ResponseWriter, parameters)
+	Parameters() parameters
+}
+
+type parameters interface {
+	Apply(context.Context, map[string]string, io.Reader) error
 }
 
 type empty struct{}
 
-func (*empty) Validate(map[string]string, io.Reader) error { return nil }
+func (*empty) Parameters() parameters                                    { return nil }
+func (*empty) Apply(context.Context, map[string]string, io.Reader) error { return nil }

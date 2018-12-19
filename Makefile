@@ -19,4 +19,7 @@ build: clear
 		-t 242617/pace:latest \
 		.
 
+push: build
+	docker push 242617/pace:latest
+
 all: run

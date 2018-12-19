@@ -1,8 +1,10 @@
 package server
 
 import (
+	"context"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/242617/pace/config"
 )
@@ -18,13 +20,23 @@ func Init() error {
 		}
 		fmt.Println("name", name)
 
-		values := map[string]string{}
+		parameters := map[string]string{}
 		for k, v := range r.URL.Query() {
-			values[k] = v[0]
+			parameters[k] = v[0]
 		}
 
+		ctx, cancel := context.WithTimeout(context.Background(), time.Minute)
+		defer cancel()
+
 		defer r.Body.Close()
-		route.Handler.Process(w, r.Body, values)
+		params := route.Handler.Parameters()
+		err := params.Apply(ctx, parameters, r.Body)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		route.Handler.Process(w, params)
 
 	})
 	return http.ListenAndServe(config.ServerAddress, nil)
