@@ -19,7 +19,7 @@ func (*sms_request) Process(ctx context.Context, w http.ResponseWriter, headers 
 
 	code, cookie, err := piggybox.SMSRequest(params.Phone)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusServiceUnavailable)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	fmt.Println("code", code)

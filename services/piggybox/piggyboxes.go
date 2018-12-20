@@ -28,6 +28,7 @@ func Piggyboxes(token, cookie string) ([]model.Piggybox, error) {
 		log.Println("err", err)
 		return nil, err
 	}
+	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		log.Println("res.StatusCode", res.StatusCode)
 		defer res.Body.Close()
@@ -45,7 +46,6 @@ func Piggyboxes(token, cookie string) ([]model.Piggybox, error) {
 		} `json:"data"`
 	}
 
-	defer res.Body.Close()
 	err = json.NewDecoder(res.Body).Decode(&response)
 	if err != nil {
 		log.Println("err", err)

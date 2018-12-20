@@ -14,13 +14,6 @@ import (
 type profile_get struct{ empty }
 
 func (*profile_get) Process(ctx context.Context, w http.ResponseWriter, headers headers, parameters parameters) {
-	// params := parameters.(*profile_get)
-
-	// user, err := storage.GetUser(ctx, "")
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// }
-	// fmt.Println(user)
 
 	cookie, token := headers[HeaderCookie], headers[HeaderToken]
 	fmt.Println("cookie", cookie)

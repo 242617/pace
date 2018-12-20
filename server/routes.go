@@ -26,4 +26,5 @@ var Routes = routes{
 	"sms_confirm":  {"/sms/confirm", http.MethodPost, &sms_confirm{}},
 	"get_profile":  {"/profile", http.MethodGet, &profile_get{}},
 	"edit_profile": {"/profile", http.MethodPut, &profile_edit{}},
+	"checkout":     {"/checkout", http.MethodPost, &checkout{}},
 }

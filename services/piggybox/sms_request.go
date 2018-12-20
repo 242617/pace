@@ -40,6 +40,7 @@ func SMSRequest(rawPhone string) (string, string, error) {
 		log.Println("err", err)
 		return "", "", err
 	}
+	defer res.Body.Close()
 	if res.StatusCode != http.StatusCreated {
 		log.Println("res.StatusCode", res.StatusCode)
 		return "", "", ErrIncorrectStatusCode
@@ -59,7 +60,6 @@ func SMSRequest(rawPhone string) (string, string, error) {
 		} `json:"data"`
 	}
 
-	defer res.Body.Close()
 	err = json.NewDecoder(res.Body).Decode(&response)
 	if err != nil {
 		log.Println("err", err)

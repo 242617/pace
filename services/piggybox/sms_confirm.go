@@ -37,6 +37,7 @@ func SMSConfirm(code, vcode string, cookie string) (string, string, string, erro
 		log.Println("err", err)
 		return "", "", "", err
 	}
+	defer res.Body.Close()
 	if res.StatusCode != http.StatusCreated {
 		log.Println("res.StatusCode", res.StatusCode)
 		return "", "", "", ErrIncorrectStatusCode
@@ -49,7 +50,6 @@ func SMSConfirm(code, vcode string, cookie string) (string, string, string, erro
 		} `json:"data"`
 	}
 
-	defer res.Body.Close()
 	err = json.NewDecoder(res.Body).Decode(&response)
 	if err != nil {
 		log.Println("err", err)
