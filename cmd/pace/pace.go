@@ -5,7 +5,6 @@ import (
 	"log"
 
 	"github.com/242617/pace/server"
-	"github.com/242617/pace/services/piggybox"
 	"github.com/242617/pace/storage"
 	"github.com/242617/pace/version"
 )
@@ -15,11 +14,6 @@ func main() {
 	fmt.Printf("%s starting\n", version.Application)
 
 	err := storage.Init()
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = piggybox.Init()
 	if err != nil {
 		log.Fatal(err)
 	}
