@@ -56,20 +56,13 @@ func (*checkout) Process(ctx context.Context, w http.ResponseWriter, headers hea
 
 }
 
-func fix(raw string, success string) (string, error) {
-
+func fix(raw string, successUrl string) (string, error) {
 	u, err := url.Parse(raw)
 	if err != nil {
 		return "", err
 	}
-	query := url.Values{}
-	for k, v := range u.Query() {
-		if k == "successUrl" {
-			query.Add(k, success)
-		} else {
-			query.Add(k, v[0])
-		}
-	}
-	return query.Encode(), nil
-
+	q := u.Query()
+	q.Set("successUrl", successUrl)
+	u.RawQuery = q.Encode()
+	return u.String(), nil
 }
