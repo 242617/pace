@@ -14,12 +14,12 @@ import (
 type profile_get struct{ empty }
 
 func (*profile_get) Process(ctx context.Context, w http.ResponseWriter, headers headers, parameters parameters) {
+	phone := headers["Phone"]
+	log.Println("phone", phone)
 
 	cookie, token := headers[HeaderCookie], headers[HeaderToken]
 	log.Println("cookie", cookie)
 	log.Println("token", token)
-
-	phone := "79262545601"
 
 	user, err := storage.GetUserByPhone(ctx, phone)
 	if err != nil {

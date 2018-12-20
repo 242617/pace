@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"log"
 	"net/http"
 	"strings"
@@ -18,6 +19,8 @@ type checkout struct {
 func (*checkout) Parameters() parameters { return &checkout{} }
 func (*checkout) Process(ctx context.Context, w http.ResponseWriter, headers headers, parameters parameters) {
 	params := parameters.(*checkout)
+	phone := headers["Phone"]
+	log.Println("phone", phone)
 
 	params.Image = params.Image[strings.IndexByte(params.Image, ',')+1:]
 	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(params.Image))
@@ -46,7 +49,7 @@ func (*checkout) Process(ctx context.Context, w http.ResponseWriter, headers hea
 	// }
 	// log.Println(name, data)
 
-	user, err := storage.GetUserByPersonID(ctx, personID)
+	receiver, err := storage.GetUserByPersonID(ctx, personID)
 	if err != nil {
 		log.Println("err", err)
 		switch err {
@@ -57,8 +60,20 @@ func (*checkout) Process(ctx context.Context, w http.ResponseWriter, headers hea
 		}
 		return
 	}
-	log.Println(user)
+	log.Println(receiver)
+	log.Println("receiver.Alias", receiver.Alias)
+
+	response := struct {
+		Alias string `json:"alias"`
+	}{receiver.Alias}
 
 	w.WriteHeader(http.StatusCreated)
+
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		log.Println("err", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 }

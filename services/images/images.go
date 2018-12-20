@@ -6,8 +6,7 @@ import (
 	"os"
 
 	"github.com/242617/pace/config"
-
-	"github.qiwi.com/ssk-dev-apps/piggybox/utils"
+	"github.com/242617/pace/utils"
 )
 
 var g = utils.NewGenerator()

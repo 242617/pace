@@ -1,8 +1,8 @@
 package cognitive
 
 import (
-	"bytes"
 	"encoding/json"
+	"io"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -10,24 +10,13 @@ import (
 	"github.com/242617/pace/config"
 )
 
-func CreatePerson(name, data string) (string, error) {
+func AddFace(personID string, reader io.Reader) (string, error) {
 
-	buf := bytes.NewBuffer([]byte{})
-	request := struct {
-		Name string `json:"name"`
-		Data string `json:"userData"`
-	}{name, data}
-	err := json.NewEncoder(buf).Encode(request)
-	if err != nil {
-		log.Println("err", err)
-		return "", err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, config.CognitiveURL+"/persongroups/"+groupID+"/persons", buf)
+	req, err := http.NewRequest(http.MethodPost, config.CognitiveURL+"/persongroups/"+groupID+"/persons/"+personID+"/persistedFaces", reader)
 	if err != nil {
 		return "", err
 	}
-	req.Header.Add("Content-Type", "application/json")
+	req.Header.Add("Content-Type", "application/octet-stream")
 	req.Header.Add("Ocp-Apim-Subscription-Key", config.CognitiveKey)
 
 	client := &http.Client{Timeout: DefaultTimeout}
@@ -45,7 +34,7 @@ func CreatePerson(name, data string) (string, error) {
 	}
 
 	var response struct {
-		PersonID string `json:"personId"`
+		PersistedFaceID string `json:"persistedFaceId"`
 	}
 	err = json.NewDecoder(res.Body).Decode(&response)
 	if err != nil {
@@ -53,6 +42,6 @@ func CreatePerson(name, data string) (string, error) {
 		return "", err
 	}
 
-	return response.PersonID, nil
+	return response.PersistedFaceID, nil
 
 }

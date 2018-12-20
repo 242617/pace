@@ -21,25 +21,11 @@ type profile_edit struct {
 func (*profile_edit) Parameters() parameters { return &profile_edit{} }
 func (*profile_edit) Process(ctx context.Context, w http.ResponseWriter, headers headers, parameters parameters) {
 	params := parameters.(*profile_edit)
-
-	phone := "79262545601"
+	phone := headers["Phone"]
+	log.Println("phone", phone)
 
 	user, err := storage.GetUserByPhone(ctx, phone)
-	if err == storage.ErrNotFound {
-		log.Println("err", err)
-		err = storage.CreateUser(ctx, phone)
-		if err != nil {
-			log.Println("err", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-		user, err = storage.GetUserByPhone(ctx, phone)
-		if err != nil {
-			log.Println("err", err)
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-	} else if err != nil {
+	if err != nil {
 		log.Println("err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -47,7 +33,7 @@ func (*profile_edit) Process(ctx context.Context, w http.ResponseWriter, headers
 	log.Println(user)
 
 	if params.Name != nil {
-		err = storage.UpdateUserPersonID(ctx, phone, *params.Name)
+		err = storage.UpdateUserName(ctx, phone, *params.Name)
 		if err != nil {
 			log.Println("err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -66,7 +52,7 @@ func (*profile_edit) Process(ctx context.Context, w http.ResponseWriter, headers
 
 	if params.Image != nil {
 
-		err := cognitive.CreatePerson(user.Phone, "")
+		personID, err := cognitive.CreatePerson(user.Phone, "")
 		if err != nil {
 			log.Println("err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -77,21 +63,20 @@ func (*profile_edit) Process(ctx context.Context, w http.ResponseWriter, headers
 		image = image[strings.IndexByte(image, ',')+1:]
 		reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(image))
 
-		faceID, err := cognitive.Detect(reader)
+		persistedFaceId, err := cognitive.AddFace(personID, reader)
 		if err != nil {
 			log.Println("err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		log.Println("faceID", faceID)
+		log.Println("persistedFaceId", persistedFaceId)
 
-		personID, _, err := cognitive.Identify(faceID)
+		err = cognitive.Train()
 		if err != nil {
 			log.Println("err", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
-		log.Println("personID", personID)
 
 		if user.PersonID != personID {
 			err = storage.UpdateUserPersonID(ctx, phone, personID)

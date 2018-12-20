@@ -7,6 +7,7 @@ import (
 	"net/http"
 
 	"github.com/242617/pace/services/piggybox"
+	"github.com/242617/pace/storage"
 )
 
 type sms_confirm struct {
@@ -30,6 +31,23 @@ func (*sms_confirm) Process(ctx context.Context, w http.ResponseWriter, headers 
 	log.Println("phone", phone)
 	log.Println("token", token)
 	log.Println("cookie", cookie)
+
+	user, err := storage.GetUserByPhone(ctx, phone)
+	if err == storage.ErrNotFound {
+
+		err = storage.CreateUser(ctx, phone)
+		if err != nil {
+			log.Println("err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+	} else if err != nil {
+		log.Println("err", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	log.Println(user)
 
 	response := struct {
 		Phone  string `json:"phone"`
