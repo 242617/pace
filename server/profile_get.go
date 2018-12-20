@@ -34,13 +34,44 @@ func (*profile_get) Process(ctx context.Context, w http.ResponseWriter, headers 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	log.Println("len(piggyboxes)", len(piggyboxes))
 
-	log.Println("piggyboxes", piggyboxes)
 	response := struct {
 		Name       string           `json:"name"`
 		Alias      string           `json:"alias"`
 		Piggyboxes []model.Piggybox `json:"piggyboxes"`
-	}{user.Name, user.Alias, piggyboxes}
+	}{}
+	response.Name = user.Name
+	response.Alias = user.Alias
+
+	if len(piggyboxes) == 0 {
+
+		alias, err := piggybox.Create(token, cookie)
+		if err != nil {
+			log.Println("err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		log.Println("alias", alias)
+
+		piggyboxes, err = piggybox.Piggyboxes(token, cookie)
+		if err != nil {
+			log.Println("err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+		log.Println("len(piggyboxes)", len(piggyboxes))
+
+		response.Alias = ""
+		err = storage.UpdateUserAlias(ctx, phone, "")
+		if err != nil {
+			log.Println("err", err)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+			return
+		}
+
+	}
+	response.Piggyboxes = piggyboxes
 
 	w.WriteHeader(http.StatusOK)
 
