@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"net/url"
+
+	"github.com/242617/pace/config"
 
 	"github.com/242617/pace/services/piggybox"
 )
@@ -30,6 +33,13 @@ func (*checkout) Process(ctx context.Context, w http.ResponseWriter, headers hea
 		return
 	}
 
+	url, err = fix(url, config.SuccessPage)
+	if err != nil {
+		log.Println("err", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	response := struct {
 		Transaction string `json:"transaction"`
 		Url         string `json:"url"`
@@ -43,5 +53,23 @@ func (*checkout) Process(ctx context.Context, w http.ResponseWriter, headers hea
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
+}
+
+func fix(raw string, success string) (string, error) {
+
+	u, err := url.Parse(raw)
+	if err != nil {
+		return "", err
+	}
+	query := url.Values{}
+	for k, v := range u.Query() {
+		if k == "successUrl" {
+			query.Add(k, success)
+		} else {
+			query.Add(k, v[0])
+		}
+	}
+	return query.Encode(), nil
 
 }

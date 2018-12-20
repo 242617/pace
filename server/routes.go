@@ -1,8 +1,6 @@
 package server
 
-import (
-	"net/http"
-)
+import "net/http"
 
 type route struct {
 	URL     string

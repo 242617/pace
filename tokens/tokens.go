@@ -6,14 +6,14 @@ import (
 )
 
 const (
-	TokenModeSMSRequest = iota
+	TokenTypeSMSRequest = iota
 )
 
 func NewToken(mode int, claims interface{}) string {
 
 	var duration time.Duration
 	switch mode {
-	case TokenModeSMSRequest:
+	case TokenTypeSMSRequest:
 		duration = time.Minute
 	default:
 		duration = time.Minute
