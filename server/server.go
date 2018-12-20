@@ -3,11 +3,8 @@ package server
 import (
 	"context"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
-	"os"
-	"strings"
 	"time"
 
 	"github.com/242617/pace/config"
@@ -27,30 +24,6 @@ func Init() error {
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Origin", r.Header.Get("Origin"))
 		if r.Method == http.MethodOptions {
-			return
-		}
-
-		if strings.HasPrefix(r.RequestURI, "/images") {
-			name := strings.TrimPrefix(r.RequestURI, "/images")
-			log.Println("name", name)
-			filename := config.ImagesPath + name
-			log.Println("filename", filename)
-
-			file, err := os.OpenFile(filename, os.O_RDONLY, 0644)
-			defer file.Close()
-
-			if err != nil {
-				log.Println("err", err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-			_, err = io.Copy(w, file)
-			if err != nil {
-				log.Println("err", err)
-				http.Error(w, err.Error(), http.StatusInternalServerError)
-				return
-			}
-
 			return
 		}
 

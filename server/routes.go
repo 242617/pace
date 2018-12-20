@@ -27,4 +27,5 @@ var Routes = routes{
 	"get_profile":  {"/profile", http.MethodGet, &profile_get{}},
 	"edit_profile": {"/profile", http.MethodPut, &profile_edit{}},
 	"checkout":     {"/checkout", http.MethodPost, &checkout{}},
+	"alias":        {"/alias", http.MethodPost, &alias{}},
 }

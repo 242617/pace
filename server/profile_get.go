@@ -42,7 +42,7 @@ func (*profile_get) Process(ctx context.Context, w http.ResponseWriter, headers 
 		Piggyboxes []model.Piggybox `json:"piggyboxes"`
 	}{user.Name, user.Alias, piggyboxes}
 
-	w.WriteHeader(http.StatusAccepted)
+	w.WriteHeader(http.StatusOK)
 
 	err = json.NewEncoder(w).Encode(response)
 	if err != nil {
@@ -50,4 +50,5 @@ func (*profile_get) Process(ctx context.Context, w http.ResponseWriter, headers 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+
 }

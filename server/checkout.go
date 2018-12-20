@@ -2,18 +2,16 @@ package server
 
 import (
 	"context"
-	"encoding/base64"
 	"encoding/json"
 	"log"
 	"net/http"
-	"strings"
 
-	"github.com/242617/pace/services/cognitive"
-	"github.com/242617/pace/storage"
+	"github.com/242617/pace/services/piggybox"
 )
 
 type checkout struct {
-	Image string `json:"image"`
+	Alias  string  `json:"alias"`
+	Amount float64 `json:"amount"`
 }
 
 func (*checkout) Parameters() parameters { return &checkout{} }
@@ -22,50 +20,20 @@ func (*checkout) Process(ctx context.Context, w http.ResponseWriter, headers hea
 	phone := headers["Phone"]
 	log.Println("phone", phone)
 
-	params.Image = params.Image[strings.IndexByte(params.Image, ',')+1:]
-	reader := base64.NewDecoder(base64.StdEncoding, strings.NewReader(params.Image))
+	log.Println("params.Alias", params.Alias)
+	log.Println("params.Amount", params.Amount)
 
-	faceID, err := cognitive.Detect(reader)
+	transaction, url, err := piggybox.Checkout(params.Alias, params.Amount, phone)
 	if err != nil {
 		log.Println("err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	log.Println("faceID", faceID)
-
-	personID, _, err := cognitive.Identify(faceID)
-	if err != nil {
-		log.Println("err", err)
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-	log.Println("personID", personID)
-
-	// name, data, err := cognitive.Person(personID)
-	// if err != nil {
-	// 	log.Println("err", err)
-	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
-	// 	return
-	// }
-	// log.Println(name, data)
-
-	receiver, err := storage.GetUserByPersonID(ctx, personID)
-	if err != nil {
-		log.Println("err", err)
-		switch err {
-		case storage.ErrNotFound:
-			http.Error(w, err.Error(), http.StatusNotFound)
-		default:
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-		return
-	}
-	log.Println(receiver)
-	log.Println("receiver.Alias", receiver.Alias)
 
 	response := struct {
-		Alias string `json:"alias"`
-	}{receiver.Alias}
+		Transaction string `json:"transaction"`
+		Url         string `json:"url"`
+	}{transaction, url}
 
 	w.WriteHeader(http.StatusCreated)
 
