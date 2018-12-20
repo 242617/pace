@@ -2,7 +2,6 @@ package piggybox
 
 import (
 	"encoding/json"
-	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -33,7 +32,7 @@ func Piggyboxes(token, cookie string) ([]model.Piggybox, error) {
 		log.Println("res.StatusCode", res.StatusCode)
 		defer res.Body.Close()
 		barr, _ := ioutil.ReadAll(res.Body)
-		fmt.Println(string(barr))
+		log.Println(string(barr))
 		return nil, ErrIncorrectStatusCode
 	}
 

@@ -1,7 +1,6 @@
 package cognitive
 
 import (
-	"bytes"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -9,22 +8,12 @@ import (
 	"github.com/242617/pace/config"
 )
 
-func CreatePerson(name, data string) error {
+func Person(personID string) (string, string, error) {
 
-	buf := bytes.NewBuffer([]byte{})
-	request := struct {
-		Name string `json:"name"`
-		Data string `json:"userData"`
-	}{name, data}
-	err := json.NewEncoder(buf).Encode(request)
+	req, err := http.NewRequest(http.MethodGet, config.CognitiveURL+"/persongroups/"+groupID+"/persons/"+personID, nil)
 	if err != nil {
 		log.Println("err", err)
-		return err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, config.CognitiveURL+"/persongroups/"+groupID+"/persons", buf)
-	if err != nil {
-		return err
+		return "", "", err
 	}
 	req.Header.Add("Content-Type", "application/json")
 	req.Header.Add("Ocp-Apim-Subscription-Key", config.CognitiveKey)
@@ -33,25 +22,29 @@ func CreatePerson(name, data string) error {
 	res, err := client.Do(req)
 	if err != nil {
 		log.Println("err", err)
-		return err
+		return "", "", err
 	}
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		log.Println("res.StatusCode", res.StatusCode)
-		// barr, _ := ioutil.ReadAll(res.Body)
-		// log.Println(string(barr))
-		return ErrIncorrectStatusCode
+		return "", "", ErrIncorrectStatusCode
 	}
 
 	var response struct {
-		PersonID string `json:"personId"`
+		PersonId         string   `json:"personId"`
+		PersistedFaceIds []string `json:"persistedFaceIds"`
+		Name             string   `json:"name"`
+		Data             string   `json:"userData"`
 	}
 	err = json.NewDecoder(res.Body).Decode(&response)
 	if err != nil {
 		log.Println("err", err)
-		return err
+		return "", "", err
 	}
 
-	return nil
+	name := response.Name
+	data := response.Data
+
+	return name, data, nil
 
 }

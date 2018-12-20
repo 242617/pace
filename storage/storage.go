@@ -3,15 +3,10 @@ package storage
 import (
 	"context"
 	"database/sql"
-	"errors"
 	"time"
 
 	"github.com/242617/pace/config"
 	_ "github.com/lib/pq"
-)
-
-var (
-	ErrNotImplemented = errors.New("not implemented")
 )
 
 var db *sql.DB

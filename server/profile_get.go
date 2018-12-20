@@ -3,12 +3,12 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
 	"github.com/242617/pace/model"
 	"github.com/242617/pace/services/piggybox"
+	"github.com/242617/pace/storage"
 )
 
 type profile_get struct{ empty }
@@ -16,8 +16,17 @@ type profile_get struct{ empty }
 func (*profile_get) Process(ctx context.Context, w http.ResponseWriter, headers headers, parameters parameters) {
 
 	cookie, token := headers[HeaderCookie], headers[HeaderToken]
-	fmt.Println("cookie", cookie)
-	fmt.Println("token", token)
+	log.Println("cookie", cookie)
+	log.Println("token", token)
+
+	phone := "79262545601"
+
+	user, err := storage.GetUserByPhone(ctx, phone)
+	if err != nil {
+		log.Println("err", err)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	piggyboxes, err := piggybox.Piggyboxes(token, cookie)
 	if err != nil {
@@ -26,11 +35,12 @@ func (*profile_get) Process(ctx context.Context, w http.ResponseWriter, headers 
 		return
 	}
 
-	fmt.Println("piggyboxes", piggyboxes)
+	log.Println("piggyboxes", piggyboxes)
 	response := struct {
 		Name       string           `json:"name"`
+		Alias      string           `json:"alias"`
 		Piggyboxes []model.Piggybox `json:"piggyboxes"`
-	}{"user.Name", piggyboxes}
+	}{user.Name, user.Alias, piggyboxes}
 
 	w.WriteHeader(http.StatusAccepted)
 

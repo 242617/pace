@@ -2,7 +2,6 @@ package cognitive
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"log"
@@ -29,11 +28,8 @@ func Detect(reader io.Reader) (string, error) {
 	defer res.Body.Close()
 	if res.StatusCode != http.StatusOK {
 		log.Println("res.StatusCode", res.StatusCode)
-
-		defer res.Body.Close()
 		barr, _ := ioutil.ReadAll(res.Body)
-		fmt.Println(string(barr))
-
+		log.Println(string(barr))
 		return "", ErrIncorrectStatusCode
 	}
 
@@ -44,6 +40,10 @@ func Detect(reader io.Reader) (string, error) {
 	if err != nil {
 		log.Println("err", err)
 		return "", err
+	}
+
+	if len(response) == 0 {
+		return "", ErrNotFound
 	}
 
 	return response[0].FaceID, nil

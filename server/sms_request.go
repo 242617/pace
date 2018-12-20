@@ -3,7 +3,7 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/242617/pace/services/piggybox"
@@ -22,8 +22,8 @@ func (*sms_request) Process(ctx context.Context, w http.ResponseWriter, headers 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("code", code)
-	fmt.Println("cookie", cookie)
+	log.Println("code", code)
+	log.Println("cookie", cookie)
 
 	response := struct {
 		Code   string `json:"code"`

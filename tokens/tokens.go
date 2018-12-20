@@ -1,7 +1,7 @@
 package tokens
 
 import (
-	"fmt"
+	"log"
 	"time"
 )
 
@@ -19,7 +19,7 @@ func NewToken(mode int, claims interface{}) string {
 		duration = time.Minute
 	}
 
-	fmt.Println(duration)
+	log.Println(duration)
 
 	return ""
 }

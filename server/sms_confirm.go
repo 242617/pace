@@ -3,7 +3,6 @@ package server
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 
@@ -28,9 +27,9 @@ func (*sms_confirm) Process(ctx context.Context, w http.ResponseWriter, headers 
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("phone", phone)
-	fmt.Println("token", token)
-	fmt.Println("cookie", cookie)
+	log.Println("phone", phone)
+	log.Println("token", token)
+	log.Println("cookie", cookie)
 
 	response := struct {
 		Phone  string `json:"phone"`

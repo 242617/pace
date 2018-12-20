@@ -26,6 +26,7 @@ func Identify(faceID string) (string, float64, error) {
 
 	req, err := http.NewRequest(http.MethodPost, config.CognitiveURL+"/identify", buf)
 	if err != nil {
+		log.Println("err", err)
 		return "", 0, err
 	}
 	req.Header.Add("Content-Type", "application/json")
@@ -57,7 +58,7 @@ func Identify(faceID string) (string, float64, error) {
 	}
 
 	if len(response) == 0 || len(response[0].Candidates) == 0 {
-		return "", 0, ErrEmptyList
+		return "", 0, ErrNotFound
 	}
 
 	personID := response[0].Candidates[0].PersonId

@@ -3,12 +3,12 @@ package server
 import (
 	"context"
 	"encoding/base64"
-	"fmt"
 	"log"
 	"net/http"
 	"strings"
 
 	"github.com/242617/pace/services/cognitive"
+	"github.com/242617/pace/storage"
 )
 
 type checkout struct {
@@ -28,19 +28,15 @@ func (*checkout) Process(ctx context.Context, w http.ResponseWriter, headers hea
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("faceID", faceID)
+	log.Println("faceID", faceID)
 
-	personID, confidence, err := cognitive.Identify(faceID)
+	personID, _, err := cognitive.Identify(faceID)
 	if err != nil {
 		log.Println("err", err)
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println("personID", personID)
-	if confidence < .6 {
-		http.Error(w, "low confidence", http.StatusBadRequest)
-		return
-	}
+	log.Println("personID", personID)
 
 	// name, data, err := cognitive.Person(personID)
 	// if err != nil {
@@ -48,7 +44,20 @@ func (*checkout) Process(ctx context.Context, w http.ResponseWriter, headers hea
 	// 	http.Error(w, err.Error(), http.StatusInternalServerError)
 	// 	return
 	// }
-	// fmt.Println(name, data)
+	// log.Println(name, data)
+
+	user, err := storage.GetUserByPersonID(ctx, personID)
+	if err != nil {
+		log.Println("err", err)
+		switch err {
+		case storage.ErrNotFound:
+			http.Error(w, err.Error(), http.StatusNotFound)
+		default:
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+		return
+	}
+	log.Println(user)
 
 	w.WriteHeader(http.StatusCreated)
 

@@ -32,9 +32,9 @@ func Init() error {
 
 		if strings.HasPrefix(r.RequestURI, "/images") {
 			name := strings.TrimPrefix(r.RequestURI, "/images")
-			fmt.Println("name", name)
+			log.Println("name", name)
 			filename := config.ImagesPath + name
-			fmt.Println("filename", filename)
+			log.Println("filename", filename)
 
 			file, err := os.OpenFile(filename, os.O_RDONLY, 0644)
 			defer file.Close()
@@ -59,7 +59,7 @@ func Init() error {
 			http.Error(w, "not implemented", http.StatusNotImplemented)
 			return
 		}
-		fmt.Println("name", name)
+		log.Println("name", name)
 
 		parameters := map[string]string{}
 		for k, v := range r.URL.Query() {

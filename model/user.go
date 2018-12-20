@@ -2,10 +2,11 @@ package model
 
 type User struct {
 	ExternalUser
-	Phone  string `json:"phone"`
-	FaceID string `json:"face_id"`
+	Phone    string `json:"phone"`
+	PersonID string `json:"person_id"`
 }
 
 type ExternalUser struct {
-	Name string `json:"name"`
+	Alias string `json:"alias"`
+	Name  string `json:"name"`
 }

@@ -3,7 +3,6 @@ package piggybox
 import (
 	"bytes"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 	"strconv"
@@ -64,10 +63,10 @@ func SMSConfirm(code, vcode string, cookie string) (string, string, string, erro
 	}
 
 	phone := strconv.FormatInt(response.Data.Phone, 10)
-	fmt.Println("phone", phone)
+	log.Println("phone", phone)
 
 	token := response.Data.Token
-	fmt.Println("token", token)
+	log.Println("token", token)
 
 	return phone, token, cookie, nil
 
